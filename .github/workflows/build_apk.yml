@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up JDK 17 (required for modern Android builds)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Navigate into the project directory and make gradlew executable
+      - name: Make gradlew executable
+        run: |
+          cd NEXT_v2_full
+          chmod +x ./gradlew
+
+      # 4. Build the APK (Release mode)
+      - name: Build Release APK
+        run: |
+          cd NEXT_v2_full
+          ./gradlew assembleRelease
+
+      # 5. Upload the APK as a downloadable artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEXT-App-APK
+          path: NEXT_v2_full/app/build/outputs/apk/release/app-release.apk
